@@ -91,6 +91,7 @@ class DeviceFragment : Fragment() {
   // The current state of the device.
   var isOnline = false
   var isOn = false
+  var temperatureMeasurement = 0
 
   // -----------------------------------------------------------------------------------------------
   // Lifecycle functions
@@ -193,7 +194,7 @@ class DeviceFragment : Fragment() {
     // Change the on/off state of the device
     binding.onoffSwitch.setOnClickListener {
       val isOn = binding.onoffSwitch.isChecked
-      viewModel.updateDeviceStateOn(selectedDeviceViewModel.selectedDeviceLiveData.value!!, isOn)
+      viewModel.updateDeviceStateOn(selectedDeviceViewModel.selectedDeviceLiveData.value!!, isOn, temperatureMeasurement)
     }
     // CODELAB FEATURED END
 
@@ -343,6 +344,12 @@ class DeviceFragment : Fragment() {
             null -> deviceUiModel.isOn
             else -> deviceState.on
           }
+      temperatureMeasurement =
+        when (deviceState) {
+          null -> deviceUiModel.temperatureMeasurement
+          else -> 0
+        }
+
 
       binding.topAppBar.title = deviceUiModel.device.name
 
@@ -354,6 +361,7 @@ class DeviceFragment : Fragment() {
           getString(R.string.share_device_name, deviceUiModel.device.name)
       binding.onOffTextView.text = stateDisplayString(isOnline, isOn)
       binding.stateLayout.background = shapeDrawable
+
       if (ON_OFF_SWITCH_DISABLED_WHEN_DEVICE_OFFLINE) {
         binding.onoffSwitch.isEnabled = isOnline
       } else {

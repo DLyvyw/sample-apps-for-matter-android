@@ -65,6 +65,7 @@ class DeviceViewHolder(private val binding: DeviceViewItemBinding) :
     binding.name.text = deviceUiModel.device.name
     binding.zestate.text = stateDisplayString(deviceUiModel.isOnline, deviceUiModel.isOn)
     binding.rootLayout.background = shapeDrawable
+    binding.ztemperature.text = deviceUiModel.temperatureMeasurement.toString()
     if (ON_OFF_SWITCH_DISABLED_WHEN_DEVICE_OFFLINE) {
       binding.onoffSwitch.isEnabled = deviceUiModel.isOnline
     } else {

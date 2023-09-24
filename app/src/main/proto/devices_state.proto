@@ -33,6 +33,8 @@ message DeviceState {
     // Whether the device is off (false) or on (true). Value should be disregarded
     // if device is offline.
     bool on = 4;
+
+    int32 temperature = 5;
 }
 
 message DevicesState {

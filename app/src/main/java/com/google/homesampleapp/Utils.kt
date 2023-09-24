@@ -274,7 +274,7 @@ const val MIN_COMMISSIONING_WINDOW_EXPIRATION_SECONDS = 20
 // Constants to modify the behavior of the app.
 
 // Whether the on/off switch is disabled when the device is offline.
-const val ON_OFF_SWITCH_DISABLED_WHEN_DEVICE_OFFLINE = false
+const val ON_OFF_SWITCH_DISABLED_WHEN_DEVICE_OFFLINE = true
 
 // ----- Periodic monitoring of device state changes -----
 

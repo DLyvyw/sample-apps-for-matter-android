@@ -36,7 +36,7 @@ class SelectedDeviceViewModel @Inject constructor() : ViewModel() {
 
   // The device currently selected, made available as LiveData.
   private val _selectedDeviceLiveData =
-      MutableLiveData(DeviceUiModel(Device.getDefaultInstance(), isOnline = false, isOn = false))
+      MutableLiveData(DeviceUiModel(Device.getDefaultInstance(), isOnline = false, isOn = false, temperatureMeasurement =  0))
   val selectedDeviceLiveData: LiveData<DeviceUiModel> = _selectedDeviceLiveData
 
   fun setSelectedDevice(deviceUiModel: DeviceUiModel) {

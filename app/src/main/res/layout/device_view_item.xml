@@ -64,6 +64,7 @@
         android:textColor="@color/mtrl_list_item_tint"
         tools:text="Online OFF"
         />
+
     </LinearLayout>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -74,5 +75,15 @@
         android:layout_centerVertical="true"
         android:paddingHorizontal="10dp"
         />
+
+    <TextView
+        android:id="@+id/ztemperature"
+        android:layout_width="93dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="23dp"
+        android:layout_toStartOf="@+id/onoff_switch"
+        android:text="TextView" />
 
 </RelativeLayout>

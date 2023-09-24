@@ -418,10 +418,39 @@ class ClustersHelper @Inject constructor(private val chipClient: ChipClient) {
     }
   }
 
-  private fun getOnOffClusterForDevice(devicePtr: Long, endpoint: Int): ChipClusters.OnOffCluster {
-    return ChipClusters.OnOffCluster(devicePtr, endpoint)
+  private fun getTemperatureMeasurementClusterForDevice(devicePtr: Long, endpoint: Int): ChipClusters.TemperatureMeasurementCluster {
+    return ChipClusters.TemperatureMeasurementCluster(devicePtr, endpoint)
   }
 
+    suspend fun getMesurementValueTemperatureMeasurementCluster(deviceId: Long, endpoint: Int): Int? {
+        Timber.d("getDeviceStateOnOffCluster())")
+        val connectedDevicePtr =
+            try {
+                chipClient.getConnectedDevicePointer(deviceId)
+            } catch (e: IllegalStateException) {
+                Timber.e("Can't get connectedDevicePointer.")
+                return null
+            }
+        return suspendCoroutine { continuation ->
+            getTemperatureMeasurementClusterForDevice(connectedDevicePtr, endpoint)
+                .readMeasuredValueAttribute(
+                    object : ChipClusters.TemperatureMeasurementCluster.MeasuredValueAttributeCallback {
+                        override fun onSuccess(value: Int?) {
+                            Timber.d("readOnOffAttribute success: [$value]")
+                            continuation.resume(value)
+                        }
+
+                        override fun onError(ex: Exception) {
+                            Timber.e(ex, "readOnOffAttribute command failure")
+                            continuation.resumeWithException(ex)
+                        }
+                    })
+        }
+    }
+
+    private fun getOnOffClusterForDevice(devicePtr: Long, endpoint: Int): ChipClusters.OnOffCluster {
+        return ChipClusters.OnOffCluster(devicePtr, endpoint)
+    }
   // -----------------------------------------------------------------------------------------------
   // Administrator Commissioning Cluster (11.19)
 

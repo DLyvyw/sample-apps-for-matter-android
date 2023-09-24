@@ -57,13 +57,14 @@ class DevicesStateRepository @Inject constructor(@ApplicationContext context: Co
   val lastUpdatedDeviceState: LiveData<DeviceState>
     get() = _lastUpdatedDeviceState
 
-  suspend fun addDeviceState(deviceId: Long, isOnline: Boolean, isOn: Boolean) {
+  suspend fun addDeviceState(deviceId: Long, isOnline: Boolean, isOn: Boolean, temperature: Int) {
     val newDeviceState =
         DeviceState.newBuilder()
             .setDeviceId(deviceId)
             .setDateCaptured(getTimestampForNow())
             .setOnline(isOnline)
             .setOn(isOn)
+            .setTemperature(temperature)
             .build()
 
     devicesStateDataStore.updateData { devicesState ->
@@ -72,13 +73,14 @@ class DevicesStateRepository @Inject constructor(@ApplicationContext context: Co
     _lastUpdatedDeviceState.value = newDeviceState
   }
 
-  suspend fun updateDeviceState(deviceId: Long, isOnline: Boolean, isOn: Boolean) {
+  suspend fun updateDeviceState(deviceId: Long, isOnline: Boolean, isOn: Boolean, temperature: Int) {
     val newDeviceState =
         DeviceState.newBuilder()
             .setDeviceId(deviceId)
             .setDateCaptured(getTimestampForNow())
             .setOnline(isOnline)
             .setOn(isOn)
+            .setTemperature(temperature)
             .build()
 
     val devicesState = devicesStateFlow.first()
@@ -98,7 +100,7 @@ class DevicesStateRepository @Inject constructor(@ApplicationContext context: Co
     if (!updateDone) {
       Timber.w(
           "We did not find device [${deviceId}] in devicesStateRepository; it should have been there???")
-      addDeviceState(deviceId, isOnline = isOnline, isOn = isOn)
+      addDeviceState(deviceId, isOnline = isOnline, isOn = isOn, temperature = temperature)
     }
   }
 

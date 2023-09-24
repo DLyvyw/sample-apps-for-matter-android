@@ -43,6 +43,7 @@ import com.google.homesampleapp.TaskStatus
 import com.google.homesampleapp.chip.ChipClient
 import com.google.homesampleapp.chip.ClustersHelper
 import com.google.homesampleapp.chip.MatterConstants.OnOffAttribute
+import com.google.homesampleapp.chip.MatterConstants.TemperatureAttribute
 import com.google.homesampleapp.chip.SubscriptionHelper
 import com.google.homesampleapp.data.DevicesRepository
 import com.google.homesampleapp.data.DevicesStateRepository
@@ -223,7 +224,7 @@ constructor(
     viewModelScope.launch { devicesRepository.removeDevice(deviceId) }
   }
 
-  fun updateDeviceStateOn(deviceUiModel: DeviceUiModel, isOn: Boolean) {
+  fun updateDeviceStateOn(deviceUiModel: DeviceUiModel, isOn: Boolean, temperature: Int) {
     Timber.d("updateDeviceStateOn: isOn [${isOn}]")
     val deviceId = deviceUiModel.device.deviceId
     viewModelScope.launch {
@@ -232,7 +233,7 @@ constructor(
       Timber.d("Handling real device")
       try {
         clustersHelper.setOnOffDeviceStateOnOffCluster(deviceUiModel.device.deviceId, isOn, 1)
-        devicesStateRepository.updateDeviceState(deviceUiModel.device.deviceId, true, isOn)
+        devicesStateRepository.updateDeviceState(deviceUiModel.device.deviceId, true, isOn, temperature = temperature)
       } catch (e: Throwable) {
         Timber.e("Failed setting on/off state")
       }
@@ -396,6 +397,11 @@ constructor(
             super.onReport(nodeState)
             val onOffState =
                 subscriptionHelper.extractAttribute(nodeState, 1, OnOffAttribute) as Boolean?
+            var temperature =
+              subscriptionHelper.extractAttribute(nodeState, 1, TemperatureAttribute) as Int?
+            if (temperature == null) {
+              temperature = 0;
+            }
             Timber.d("onOffState [${onOffState}]")
             if (onOffState == null) {
               Timber.e("onReport(): WARNING -> onOffState is NULL. Ignoring.")
@@ -403,7 +409,7 @@ constructor(
             }
             viewModelScope.launch {
               devicesStateRepository.updateDeviceState(
-                  deviceUiModel.device.deviceId, isOnline = true, isOn = onOffState)
+                  deviceUiModel.device.deviceId, isOnline = true, isOn = onOffState, temperature = temperature)
             }
           }
         }
@@ -461,6 +467,10 @@ constructor(
         var isOnline: Boolean
         // TODO: See HomeViewModel:CommissionDeviceSucceeded for device capabilities
         isOn = clustersHelper.getDeviceStateOnOffCluster(deviceUiModel.device.deviceId, 1)
+        var temperature = clustersHelper.getMesurementValueTemperatureMeasurementCluster(deviceUiModel.device.deviceId, 1)
+        if (temperature == null) {
+          temperature = 0
+        }
         if (isOn == null) {
           Timber.e("[device ping] failed")
           isOn = false
@@ -470,7 +480,7 @@ constructor(
           isOnline = true
         }
         devicesStateRepository.updateDeviceState(
-            deviceUiModel.device.deviceId, isOnline = isOnline, isOn = isOn == true)
+            deviceUiModel.device.deviceId, isOnline = isOnline, isOn = isOn == true, temperature = temperature)
         delay(PERIODIC_READ_INTERVAL_DEVICE_SCREEN_SECONDS * 1000L)
       }
     }

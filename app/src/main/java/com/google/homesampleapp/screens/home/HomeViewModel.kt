@@ -48,6 +48,7 @@ import com.google.homesampleapp.UserPreferences
 import com.google.homesampleapp.chip.ChipClient
 import com.google.homesampleapp.chip.ClustersHelper
 import com.google.homesampleapp.chip.MatterConstants.OnOffAttribute
+import com.google.homesampleapp.chip.MatterConstants.TemperatureAttribute
 import com.google.homesampleapp.chip.SubscriptionHelper
 import com.google.homesampleapp.commissioning.AppCommissioningService
 import com.google.homesampleapp.convertToAppDeviceType
@@ -75,7 +76,9 @@ data class DeviceUiModel(
     // Whether the device is online or offline.
     var isOnline: Boolean,
     // Whether the device is on or off.
-    var isOn: Boolean
+    var isOn: Boolean,
+    // Temperature
+    var temperatureMeasurement: Int,
 )
 
 /**
@@ -179,10 +182,10 @@ constructor(
       }
       if (state == null) {
         Timber.d("    deviceId setting default value for state")
-        devicesUiModel.add(DeviceUiModel(device, isOnline = false, isOn = false))
+        devicesUiModel.add(DeviceUiModel(device, isOnline = false, isOn = false, temperatureMeasurement = 0))
       } else {
         Timber.d("    deviceId setting its own value for state")
-        devicesUiModel.add(DeviceUiModel(device, state.online, state.on))
+        devicesUiModel.add(DeviceUiModel(device, state.online, state.on, temperatureMeasurement = 0))
       }
     }
     return devicesUiModel
@@ -358,7 +361,7 @@ constructor(
                     convertToAppDeviceType(result.commissionedDeviceDescriptor.deviceType.toLong()))
                 .build())
         Timber.d("Commissioning: Adding device state to repository: isOnline:true isOn:false")
-        devicesStateRepository.addDeviceState(deviceId, isOnline = true, isOn = false)
+        devicesStateRepository.addDeviceState(deviceId, isOnline = true, isOn = false, temperature = 0)
         _commissionDeviceStatus.postValue(
             TaskStatus.Completed("Device added: [${deviceId}] [${deviceName}]"))
       } catch (e: Exception) {
@@ -415,7 +418,7 @@ constructor(
     viewModelScope.launch {
       Timber.d("Handling real device")
       clustersHelper.setOnOffDeviceStateOnOffCluster(deviceUiModel.device.deviceId, isOn, 1)
-      devicesStateRepository.updateDeviceState(deviceUiModel.device.deviceId, true, isOn)
+      devicesStateRepository.updateDeviceState(deviceUiModel.device.deviceId, true, isOn, temperature =  0)
     }
   }
 
@@ -469,14 +472,20 @@ constructor(
                 // TODO: See HomeViewModel:CommissionDeviceSucceeded for device capabilities
                 val onOffState =
                     subscriptionHelper.extractAttribute(nodeState, 1, OnOffAttribute) as Boolean?
+                  var temperature =
+                      subscriptionHelper.extractAttribute(nodeState, 1, TemperatureAttribute) as Int?
                 Timber.d("onOffState [${onOffState}]")
-                if (onOffState == null) {
+                  Timber.d("temperature [${temperature}]")
+               if (onOffState == null) {
                   Timber.e("onReport(): WARNING -> onOffState is NULL. Ignoring.")
                   return
                 }
+                  if (temperature == null) {
+                      temperature = 0;
+                  }
                 viewModelScope.launch {
                   devicesStateRepository.updateDeviceState(
-                      device.deviceId, isOnline = true, isOn = onOffState)
+                      device.deviceId, isOnline = true, isOn = onOffState, temperature =  temperature)
                 }
               }
             }
@@ -543,10 +552,16 @@ constructor(
           } else {
             isOnline = true
           }
-          Timber.d("runDevicesPeriodicPing deviceId [${device.deviceId}] [${isOnline}] [${isOn}]")
+
+          var temperatureValue = clustersHelper.getMesurementValueTemperatureMeasurementCluster(device.deviceId, 1)
+          if (temperatureValue == null) {
+              temperatureValue = 0
+          }
+
+            Timber.d("runDevicesPeriodicPing deviceId [${device.deviceId}] [${isOnline}] [${isOn}]")
           // TODO: only need to do it if state has changed
           devicesStateRepository.updateDeviceState(
-              device.deviceId, isOnline = isOnline, isOn = isOn)
+              device.deviceId, isOnline = isOnline, isOn = isOn, temperature = temperatureValue  )
         }
         delay(PERIODIC_READ_INTERVAL_HOME_SCREEN_SECONDS * 1000L)
       }

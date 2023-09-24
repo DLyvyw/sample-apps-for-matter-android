@@ -22,6 +22,7 @@ object MatterConstants {
           22L to "Root Node",
           256L to "On/Off Light",
           266L to "Outlet",
+          770L to "Temperature Sensor",
       )
 
   val ClustersMap =
@@ -56,10 +57,14 @@ object MatterConstants {
           63L to "Group Key Management",
           64L to "Fixed label",
           65L to "User label",
+          1026L to "Temperature Measurement",
           1030L to "Occupancy Sensing",
       )
 
   // Well known cluster attributes
   data class ClusterAttribute(val clusterId: Long, val attributeId: Long)
   val OnOffAttribute = ClusterAttribute(6L, 0L)
+    // TODO
+    val TemperatureAttribute = ClusterAttribute(1026L, 0L)
+
 }
