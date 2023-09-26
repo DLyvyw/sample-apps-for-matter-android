@@ -33,7 +33,7 @@ class SubscriptionHelper @Inject constructor(private val chipClient: ChipClient)
       val clusterId = ChipPathId.forWildcard()
       val attributeId = ChipPathId.forWildcard()
       val minInterval = 1 // seconds
-      val maxInterval = 10 // seconds
+      val maxInterval = 5 // seconds
       val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
       val eventPath = ChipEventPath.newInstance(endpointId, clusterId, attributeId)
       Timber.d("attributePath: [${attributePath}]")

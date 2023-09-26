@@ -395,17 +395,18 @@ constructor(
         object : SubscriptionHelper.ReportCallbackForDevice(deviceUiModel.device.deviceId) {
           override fun onReport(nodeState: NodeState) {
             super.onReport(nodeState)
-            val onOffState =
+            var onOffState =
                 subscriptionHelper.extractAttribute(nodeState, 1, OnOffAttribute) as Boolean?
             var temperature =
               subscriptionHelper.extractAttribute(nodeState, 1, TemperatureAttribute) as Int?
             if (temperature == null) {
-              temperature = 0;
+              temperature = 99;
             }
             Timber.d("onOffState [${onOffState}]")
             if (onOffState == null) {
+              onOffState = true;
               Timber.e("onReport(): WARNING -> onOffState is NULL. Ignoring.")
-              return
+              //return
             }
             viewModelScope.launch {
               devicesStateRepository.updateDeviceState(

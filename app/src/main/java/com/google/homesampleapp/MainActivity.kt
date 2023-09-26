@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         unspecified = getString(R.string.device_type_unspecified),
         light = getString(R.string.device_type_light),
         outlet = getString(R.string.device_type_outlet),
+        temperature = getString(R.string.device_type_temperature),
         unknown = getString(R.string.device_type_unknown))
   }
 }

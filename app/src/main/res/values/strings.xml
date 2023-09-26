@@ -22,6 +22,7 @@
     <string name="device_type_light" translatable="false">light</string>
     <string name="device_type_outlet" translatable="false">outlet</string>
     <string name="device_type_unknown" translatable="false">unknown</string>
+    <string name="device_type_temperature" translatable="false">temperature</string>
 
     <!-- Generic status messages -->
     <string name="status_not_started" translatable="false">Not started</string>

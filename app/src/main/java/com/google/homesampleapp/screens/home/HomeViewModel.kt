@@ -182,10 +182,10 @@ constructor(
       }
       if (state == null) {
         Timber.d("    deviceId setting default value for state")
-        devicesUiModel.add(DeviceUiModel(device, isOnline = false, isOn = false, temperatureMeasurement = 0))
+        devicesUiModel.add(DeviceUiModel(device, isOnline = false, isOn = false, temperatureMeasurement = 99))
       } else {
         Timber.d("    deviceId setting its own value for state")
-        devicesUiModel.add(DeviceUiModel(device, state.online, state.on, temperatureMeasurement = 0))
+        devicesUiModel.add(DeviceUiModel(device, state.online, state.on, state.temperature))
       }
     }
     return devicesUiModel
@@ -470,7 +470,7 @@ constructor(
               override fun onReport(nodeState: NodeState) {
                 super.onReport(nodeState)
                 // TODO: See HomeViewModel:CommissionDeviceSucceeded for device capabilities
-                val onOffState =
+                var onOffState =
                     subscriptionHelper.extractAttribute(nodeState, 1, OnOffAttribute) as Boolean?
                   var temperature =
                       subscriptionHelper.extractAttribute(nodeState, 1, TemperatureAttribute) as Int?
@@ -478,10 +478,11 @@ constructor(
                   Timber.d("temperature [${temperature}]")
                if (onOffState == null) {
                   Timber.e("onReport(): WARNING -> onOffState is NULL. Ignoring.")
-                  return
+                  //return
+                   onOffState = true;
                 }
                   if (temperature == null) {
-                      temperature = 0;
+                      temperature = 99;
                   }
                 viewModelScope.launch {
                   devicesStateRepository.updateDeviceState(
@@ -555,7 +556,7 @@ constructor(
 
           var temperatureValue = clustersHelper.getMesurementValueTemperatureMeasurementCluster(device.deviceId, 1)
           if (temperatureValue == null) {
-              temperatureValue = 0
+              temperatureValue = 99
           }
 
             Timber.d("runDevicesPeriodicPing deviceId [${device.deviceId}] [${isOnline}] [${isOn}]")

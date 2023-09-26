@@ -101,6 +101,7 @@ class HomeFragmentRecyclerViewTest {
         when (testDevice.deviceType) {
           "Light" -> Device.DeviceType.TYPE_LIGHT
           "Outlet" -> Device.DeviceType.TYPE_OUTLET
+           "Temperature" -> Device.DeviceType.TYPE_TEMPERATURE_SENSOR
           else -> Device.DeviceType.TYPE_UNSPECIFIED
         }
     scope.launch {
@@ -115,11 +116,11 @@ class HomeFragmentRecyclerViewTest {
               .setName(TEST_DEVICE_NAME_PREFIX + deviceId + TEST_DEVICE_NAME_SUFFIX)
               .setRoom(TEST_DEVICE_ROOM_PREFIX + deviceId)
               .build()
-      val deviceUiModel = DeviceUiModel(device, testDevice.isOnline, testDevice.isOn)
+      val deviceUiModel = DeviceUiModel(device, testDevice.isOnline, testDevice.isOn, 0)
       // Add the device to the repository.
       devicesRepository.addDevice(deviceUiModel.device)
       devicesStateRepository.addDeviceState(
-          deviceUiModel.device.deviceId, deviceUiModel.isOnline, deviceUiModel.isOn)
+          deviceUiModel.device.deviceId, deviceUiModel.isOnline, deviceUiModel.isOn, 0)
     }
   }
 

@@ -91,7 +91,7 @@ class DeviceFragment : Fragment() {
   // The current state of the device.
   var isOnline = false
   var isOn = false
-  var temperatureMeasurement = 0
+  var temperatureMeasurement = 99
 
   // -----------------------------------------------------------------------------------------------
   // Lifecycle functions
@@ -347,7 +347,7 @@ class DeviceFragment : Fragment() {
       temperatureMeasurement =
         when (deviceState) {
           null -> deviceUiModel.temperatureMeasurement
-          else -> 0
+          else -> deviceState.temperature
         }
 
 
@@ -368,6 +368,7 @@ class DeviceFragment : Fragment() {
         binding.onoffSwitch.isEnabled = true
       }
       binding.onoffSwitch.isChecked = isOn
+      binding.temperatureTextView.text = "Temperature: " + temperatureMeasurement.toString() + " deg"
       binding.techInfoDetailsTextView.text =
           getString(
               R.string.share_device_info,
